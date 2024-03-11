@@ -1,0 +1,744 @@
+Program.Sub.ScreenSU.Start
+gui.F_Print_Certs..create
+gui.F_Print_Certs..caption("Material Certs")
+gui.F_Print_Certs..size(11745,6810)
+gui.F_Print_Certs..minx(0)
+gui.F_Print_Certs..miny(0)
+gui.F_Print_Certs..position(0,0)
+gui.F_Print_Certs..event(unload,form1_unload)
+gui.F_Print_Certs..alwaysontop(False)
+gui.F_Print_Certs..fontname("Arial")
+gui.F_Print_Certs..fontsize(8)
+gui.F_Print_Certs..forecolor(0)
+gui.F_Print_Certs..fontstyle(,,,,)
+gui.F_Print_Certs..BackColor(-2147483633)
+gui.F_Print_Certs..controlbox(True)
+gui.F_Print_Certs..maxbutton(True)
+gui.F_Print_Certs..minbutton(True)
+gui.F_Print_Certs..mousepointer(0)
+gui.F_Print_Certs..moveable(True)
+gui.F_Print_Certs..sizeable(True)
+gui.F_Print_Certs..ShowInTaskBar(True)
+gui.F_Print_Certs..titlebar(True)
+gui.F_Print_Certs.lblDefaultPrinter.create(label,"Printer:",True,600,255,1,200,190,True,0,Arial,8,-2147483633,0)
+gui.F_Print_Certs.lblDefaultPrinter.defaultvalue("")
+gui.F_Print_Certs.lblDefaultPrinter.controlgroup(0)
+gui.F_Print_Certs.gsfg_Certs.create(gsflexgrid)
+gui.F_Print_Certs.gsfg_Certs.FixedRows(0)
+gui.F_Print_Certs.gsfg_Certs.FixedCols(0)
+gui.F_Print_Certs.gsfg_Certs.visible(True)
+gui.F_Print_Certs.gsfg_Certs.size(11190,4725)
+gui.F_Print_Certs.gsfg_Certs.zorder(0)
+gui.F_Print_Certs.gsfg_Certs.position(175,875)
+gui.F_Print_Certs.gsfg_Certs.enabled(True)
+gui.F_Print_Certs.gsfg_Certs.event(cellenter,gsfg_certs_cellenter)
+gui.F_Print_Certs.gsfg_Certs.event(checkclick,gsfg_certs_checkclick)
+gui.F_Print_Certs.cmdPrint.create(button)
+gui.F_Print_Certs.cmdPrint.caption("Print")
+gui.F_Print_Certs.cmdPrint.visible(True)
+gui.F_Print_Certs.cmdPrint.size(855,375)
+gui.F_Print_Certs.cmdPrint.zorder(0)
+gui.F_Print_Certs.cmdPrint.position(200,5700)
+gui.F_Print_Certs.cmdPrint.enabled(True)
+gui.F_Print_Certs.cmdPrint.fontname("Arial")
+gui.F_Print_Certs.cmdPrint.fontsize(8)
+gui.F_Print_Certs.cmdPrint.event(click,cmdprint_click)
+gui.F_Print_Certs.cmdPrint.defaultvalue("")
+gui.F_Print_Certs.cmdPrint.controlgroup(0)
+gui.F_Print_Certs.txt_Printer.create(textbox,"",True,3705,300,0,180,400,False,0,Arial,8,-2147483643,1)
+gui.F_Print_Certs.txt_Printer.defaultvalue("")
+gui.F_Print_Certs.txt_Printer.controlgroup(0)
+gui.F_Print_Certs.cmdtxt_Printer.create(button)
+gui.F_Print_Certs.cmdtxt_Printer.caption("^")
+gui.F_Print_Certs.cmdtxt_Printer.visible(True)
+gui.F_Print_Certs.cmdtxt_Printer.size(345,345)
+gui.F_Print_Certs.cmdtxt_Printer.zorder(0)
+gui.F_Print_Certs.cmdtxt_Printer.position(3930,400)
+gui.F_Print_Certs.cmdtxt_Printer.enabled(True)
+gui.F_Print_Certs.cmdtxt_Printer.fontname("Arial")
+gui.F_Print_Certs.cmdtxt_Printer.fontsize(8)
+gui.F_Print_Certs.cmdtxt_Printer.event(click,cmdtxt_printer_click)
+gui.F_Print_Certs.cmdtxt_Printer.defaultvalue("")
+gui.F_Print_Certs.cmdtxt_Printer.controlgroup(0)
+
+
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+
+Variable.UDT.uParts.Define("Description",String)
+Variable.UDT.uParts.Define("Cert_Loc",String)
+Variable.UDT.uParts.Define("ORDER_NO",String,ORDER_NO)
+Variable.UDT.uParts.Define("Part",String,PART)
+Variable.UDT.uParts.Define("ORDER_LINE",String,ORDER_LINE)
+Variable.UDT.uParts.Define("JOB",String)
+Variable.UDT.uParts.Define("SUFFIX",String)
+Variable.UDT.uParts.Define("SEQ",String)
+Variable.UDT.uParts.Define("FLAG_BOM",String)
+Variable.uGlobal.uParts.Declare("uParts")
+Variable.UDT.uIssued.Define("Description",String)
+Variable.UDT.uIssued.Define("Cert_Loc",String)
+Variable.UDT.uIssued.Define("Part",String,PART)
+Variable.UDT.uIssued.Define("JOB",String)
+Variable.UDT.uIssued.Define("SUFFIX",String)
+Variable.UDT.uIssued.Define("SEQ",String)
+Variable.UDT.uIssued.Define("ORDER_LINE",String)
+Variable.UDT.uIssued.Define("ORDER_NO",String)
+Variable.UDT.uIssued.Define("PARENT",String,PARENT)
+Variable.uGlobal.uIssued.Declare("uIssued")
+Variable.Global.sDocGroup.Declare(Long,0)
+Variable.UDT.uGrid.Define("Part",String)
+Variable.UDT.uGrid.Define("Cert_Loc",String)
+Variable.UDT.uGrid.Define("JOB",String)
+Variable.uGlobal.uGrid.Declare("uGrid")
+Variable.Global.sPackList.Declare(String)
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+F.ODBC.Connection!conX.OpenConnection(V.Ambient.PDSN,V.Ambient.PUser,V.Ambient.PPass,72000)
+'Coded BY SFF 6/8/15
+
+'Document Control Group Default for Material Certs
+'Group ID 3 is for testing in my company SFF
+
+'V.Global.sDocGroup.Set(5)
+V.Global.sDocGroup.Set(3)
+'Buildstyles
+F.Intrinsic.Control.CallSub(Buildstyles)
+
+'Default Printer to screen
+gui.F_Print_Certs.txt_Printer.Text(v.Printer.DefaultPrinter)
+
+'From Post-Save on New Shipment
+F.Intrinsic.Control.If(V.Caller.Hook,=,28532)
+	F.Intrinsic.Control.CallSub(Packinglist)
+F.Intrinsic.Control.Else
+	'Show Browser for Packing List and Order_NO
+	F.Intrinsic.Control.CallSub(Selectpackinglist)
+F.Intrinsic.Control.Endif
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Main_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3954_MAT_CERT_PRINT.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.Main.End
+
+Program.Sub.PackingList.Start
+F.Intrinsic.Control.SetErrorHandler("PackingList_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+V.Local.sRet.Declare(String)
+V.Local.i.Declare(Float)
+V.local.bStatus.Declare(Boolean)
+V.local.sSql.Declare(String)
+V.local.iRet.Declare(Float)
+
+V.uGlobal.uParts.Redim(-1,-1)
+
+'Packing list # padded to match v_shipment_lines
+F.Intrinsic.String.LPad(V.Passed.000168,"0",7,V.Global.sPackList)
+
+'Get all parts from Packing List
+F.Intrinsic.String.Build("Select ORDER_NO,ORDER_REC as ORDER_LINE,PART from v_SHIPMENT_LINES where PCK_NO = '{0}'",V.Global.sPackList,V.Local.sSql)
+F.ODBC.Connection!conX.OpenRecordsetRO("rst",V.Local.sSql)
+F.Intrinsic.Control.If(V.ODBC.conX!rst.EOF,<>,True)
+	F.Intrinsic.Variable.LoadUDTFromRecordset("conX","rst","v.uGlobal.uParts",False)
+F.Intrinsic.Control.EndIf
+F.ODBC.conX!rst.Close
+
+'Make Sure UDT is populated before continuing
+F.Intrinsic.Control.If(V.uGlobal.uParts.UBound,<>,-1)
+	'Check for Work Order from Sales Order
+	F.Intrinsic.Control.For(V.Local.i,V.uGlobal.uParts.LBound,V.uGlobal.uParts.UBound,1)
+		F.Intrinsic.String.Build("Select JOB, SUFFIX from v_ORDER_TO_WO where ORDER_NO = '{0}' and ORDER_LINE = '{1}'",V.uGlobal.uParts(v.Local.i)!ORDER_NO,V.uGlobal.uParts(v.Local.i)!ORDER_LINE,V.Local.sSql)
+		F.ODBC.Connection!conX.OpenRecordsetRO("rst",V.Local.sSql)
+		F.Intrinsic.Control.If(V.ODBC.conX!rst.EOF,<>,True)
+			V.uGlobal.uParts(v.Local.i)!JOB.Set(V.ODBC.conX!rst.FieldVal!JOB)
+			V.uGlobal.uParts(v.Local.i)!SUFFIX.Set(V.ODBC.conX!rst.FieldVal!SUFFIX)
+		F.Intrinsic.Control.EndIf
+		F.ODBC.conX!rst.Close
+	F.Intrinsic.Control.Next(V.Local.i)
+
+	'Load Parts issued to Work Order that is tied to sales order
+	F.Intrinsic.Control.CallSub(Loadissuedparts)
+
+	'Load Documents(Material Certs) based on v.global.sDocGroup
+	F.Intrinsic.Control.CallSub(Loadcerts)
+
+	'Show Screen
+	Gui.F_Print_Certs..Show
+
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("PackingList_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3954_MAT_CERT_PRINT.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.PackingList.End
+
+Program.Sub.LoadCerts.Start
+F.Intrinsic.Control.SetErrorHandler("LoadCerts_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+'Loop through UDT check inventory and Doc control for Certs load screen only with parts that have certs
+V.Local.sRet.Declare(String)
+V.Local.i.Declare(Float)
+V.Local.i2.Declare(Float)
+V.Local.i3.Declare(Float)
+V.Local.iGrid.Declare(Float)
+V.local.bStatus.Declare(Boolean)
+V.local.sSql.Declare(String)
+V.local.iRet.Declare(Float)
+V.Local.sTemp.Declare(String)
+
+F.Intrinsic.UI.InvokeWaitDialog("Loading Material Certs Tied to Sales Order...")
+'Go through uParts, Check to see if Parent , if Parent, then loop through children and load Inventory(30) and Item Master(31) Documents based on global.sDocGroup(Material Certs)
+F.Intrinsic.Control.For(V.Local.i,V.uGlobal.uParts.LBound,V.uGlobal.uParts.UBound,1)
+	F.Intrinsic.UI.ChangeWaitStatus("Loading Material Certs Tied to Sales Order...",V.Local.i,V.uGlobal.uParts.LBound,V.uGlobal.uParts.UBound)
+	'*******uIssued Parts UDT**********************
+	'Loop through children and check for lot bin records
+	F.Intrinsic.Control.For(V.Local.i2,V.uGlobal.uIssued.LBound,V.uGlobal.uIssued.UBound,1)
+		F.Intrinsic.UI.ChangeWaitStatus("Loading Material Certs Tied to Sales Order...",V.Local.i2,V.uGlobal.uIssued.LBound,V.uGlobal.uIssued.UBound)
+		'string together in select statement as KEYID so it can be matched to item master document control
+		F.Intrinsic.String.Build("Select distinct part+location+lot+bin+heat+serial_number as KEYID,JOB from v_ITEM_HISTORY where PART = '{0}' and JOB = '{1}'",V.uGlobal.uIssued(v.Local.i2)!Part.Trim,V.uGlobal.uParts(v.Local.i)!JOB,V.Local.sSql)
+		V.Local.sTemp.Set("")
+		F.ODBC.Connection!conX.OpenRecordsetRO("rst",V.Local.sSql)
+		F.Intrinsic.Control.If(V.ODBC.conX!rst.EOF,<>,True)
+			V.uGlobal.uIssued(v.Local.i2)!JOB.Set(V.ODBC.conX!rst.FieldVal!JOB)
+			F.Intrinsic.Control.DoUntil(V.ODBC.conX!rst.EOF,=,True)
+					'Build String Array so we can loop through it for individual Documents linked
+					F.Intrinsic.String.Build("{0}{1}*!*",V.Local.sTemp,V.ODBC.conX!rst.FieldVal!KEYID,V.Local.sTemp)
+				F.ODBC.conX!rst.MoveNext
+			F.Intrinsic.Control.Loop
+		F.Intrinsic.Control.EndIf
+		F.ODBC.conX!rst.Close
+		
+		'loop through string array and get item master documents based on GRP_ID(Material Certs)
+		F.Intrinsic.String.Split(V.Local.sTemp,"*!*",V.Local.sTemp)
+		F.Intrinsic.Control.For(V.Local.i3,V.Local.sTemp.LBound,V.Local.sTemp.UBound,1)
+			F.Intrinsic.UI.ChangeWaitStatus("Loading Material Certs Tied to Sales Order...",V.Local.i3,V.Local.sTemp.LBound,V.Local.sTemp.UBound)
+			F.Intrinsic.Control.If(V.Local.sTemp(v.Local.i3).Trim,<>,"")
+
+				'Get LINKID based on KEYID part+location+lot+bin+heat+serial
+				F.Global.DocumentControl.GetLinkID(V.Local.sTemp(v.Local.i3),31,V.Local.iRet)
+				F.Intrinsic.String.Build("Select * from ATG_DOC_ASSOC where LINK_ID = '{0}' and GRP_ID = '{1}'",V.Local.iRet,V.Global.sDocGroup,V.Local.sSql)
+				F.ODBC.Connection!conX.OpenRecordsetRO("rstDoc",V.Local.sSql)
+				F.Intrinsic.Control.If(V.ODBC.conX!rstDoc.EOF,<>,True)
+
+					'Resize uGrid
+					F.Intrinsic.Math.Add(V.uGlobal.uGrid.UBound,1,V.Local.iGrid)
+					F.Intrinsic.Control.If(V.uGlobal.uGrid.LBound,=,-1)
+						V.uGlobal.uGrid.Redim(0,V.Local.iGrid)
+					F.Intrinsic.Control.Else
+						V.uGlobal.uGrid.RedimPreserve(V.uGlobal.uGrid.LBound,V.Local.iGrid)
+					F.Intrinsic.Control.EndIf
+
+					'Get Doc Path
+					F.Intrinsic.String.Build("{0}{1}",V.ODBC.conX!rstDoc.FieldValTrim!PATH,V.ODBC.conX!rstDoc.FieldValTrim!FILE,V.Local.sRet)
+					V.uGlobal.uGrid(v.Local.iGrid)!Part.Set(V.uGlobal.uIssued(v.Local.i2)!Part)
+					V.uGlobal.uGrid(v.Local.iGrid)!Cert_Loc.Set(V.Local.sRet)
+					V.uGlobal.uGrid(v.Local.iGrid)!JOB.Set(V.uGlobal.uIssued(v.Local.i2)!JOB)
+				F.Intrinsic.Control.EndIf
+				F.ODBC.conX!rstDoc.Close
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.Next(V.Local.i3)
+
+		'Now Look for Inventory Doc for that child Part# - KEYID = part+location
+		F.Intrinsic.String.Build("Select Part+Location as KEYID from v_INVENTORY_MSTR where PART = '{0}'",V.uGlobal.uIssued(v.Local.i2)!Part,V.Local.sSql)
+		F.ODBC.Connection!conX.OpenRecordsetRO("rst",V.Local.sSql)
+		F.Intrinsic.Control.If(V.ODBC.conX!rst.EOF,<>,True)
+			F.Global.DocumentControl.GetLinkID(V.ODBC.conX!rst.FieldVal!KEYID,30,V.Local.iRet)
+			F.Intrinsic.String.Build("Select * from ATG_DOC_ASSOC where LINK_ID = '{0}' and GRP_ID = '{1}'",V.Local.iRet,V.Global.sDocGroup,V.Local.sSql)
+			F.ODBC.Connection!conX.OpenRecordsetRO("rstDoc",V.Local.sSql)
+			F.Intrinsic.Control.If(V.ODBC.conX!rstDoc.EOF,<>,True)
+
+				'Resize uGrid
+				F.Intrinsic.Math.Add(V.uGlobal.uGrid.UBound,1,V.Local.iGrid)
+				F.Intrinsic.Control.If(V.uGlobal.uGrid.LBound,=,-1)
+					V.uGlobal.uGrid.Redim(0,V.Local.iGrid)
+				F.Intrinsic.Control.Else
+					V.uGlobal.uGrid.RedimPreserve(V.uGlobal.uGrid.LBound,V.Local.iGrid)
+				F.Intrinsic.Control.EndIf
+
+				'Get Doc Path
+				F.Intrinsic.String.Build("{0}{1}",V.ODBC.conX!rstDoc.FieldValTrim!PATH,V.ODBC.conX!rstDoc.FieldValTrim!FILE,V.Local.sRet)
+				V.uGlobal.uGrid(v.Local.iGrid)!Part.Set(V.uGlobal.uIssued(v.Local.i2)!Part)
+				V.uGlobal.uGrid(v.Local.iGrid)!Cert_Loc.Set(V.Local.sRet)
+			F.Intrinsic.Control.EndIf
+			F.ODBC.conX!rstDoc.Close
+		F.Intrinsic.Control.EndIf
+		F.ODBC.conX!rst.Close
+
+	F.Intrinsic.Control.Next(V.Local.i2)
+
+
+	'****CURRENT PART in uParts UDT*************
+	'Look for Item Master Records for Current Part in uParts UDT
+	V.Local.sTemp.Set("")
+	F.Intrinsic.String.Build("Select distinct part+location+lot+bin+heat+serial_number as KEYID from v_ITEM_HISTORY where PART = '{0}' and ORDER_NO = '{1}'",V.uGlobal.uParts(v.Local.i)!Part.Trim,V.uGlobal.uParts(v.Local.i)!ORDER_NO,V.Local.sSql)
+	F.ODBC.Connection!conX.OpenRecordsetRO("rst",V.Local.sSql)
+	V.Local.sTemp.sET("")
+	F.Intrinsic.Control.If(V.ODBC.conX!rst.EOF,<>,True)
+			F.Intrinsic.Control.DoUntil(V.ODBC.conX!rst.EOF,=,True)
+				'Build String Array so we can loop through it for individual Documents linked
+				F.Intrinsic.String.Build("{0}{1}*!*",V.Local.sTemp,V.ODBC.conX!rst.FieldVal!KEYID,V.Local.sTemp)
+			F.ODBC.conX!rst.MoveNext
+			F.Intrinsic.Control.Loop
+	F.Intrinsic.Control.EndIf
+	F.ODBC.conX!rst.Close
+	
+	'Loop through string array
+	F.Intrinsic.String.Split(V.Local.sTemp,"*!*",V.Local.sTemp)
+	F.Intrinsic.Control.For(V.Local.i3,V.Local.sTemp.LBound,V.Local.sTemp.UBound,1)
+		F.Intrinsic.UI.ChangeWaitStatus("Loading Material Certs Tied to Sales Order...",V.Local.i3,V.Local.sTemp.LBound,V.Local.sTemp.UBound)
+		F.Intrinsic.Control.If(V.Local.sTemp(v.Local.i3).Trim,<>,"")
+			'Get LINKID based on KEYID part+location+lot+bin+heat+serial
+			F.Global.DocumentControl.GetLinkID(V.Local.sTemp(v.Local.i3),31,V.Local.iRet)
+			F.Intrinsic.String.Build("Select * from ATG_DOC_ASSOC where LINK_ID = '{0}' and GRP_ID = '{1}'",V.Local.iRet,V.Global.sDocGroup,V.Local.sSql)
+			F.ODBC.Connection!conX.OpenRecordsetRO("rstDoc",V.Local.sSql)
+			F.Intrinsic.Control.If(V.ODBC.conX!rstDoc.EOF,<>,True)
+
+				'Resize uGrid
+				F.Intrinsic.Math.Add(V.uGlobal.uGrid.UBound,1,V.Local.iGrid)
+				F.Intrinsic.Control.If(V.uGlobal.uGrid.LBound,=,-1)
+					V.uGlobal.uGrid.Redim(0,V.Local.iGrid)
+				F.Intrinsic.Control.Else
+					V.uGlobal.uGrid.RedimPreserve(V.uGlobal.uGrid.LBound,V.Local.iGrid)
+				F.Intrinsic.Control.EndIf
+
+				'Get Doc Path
+				F.Intrinsic.String.Build("{0}{1}",V.ODBC.conX!rstDoc.FieldValTrim!PATH,V.ODBC.conX!rstDoc.FieldValTrim!FILE,V.Local.sRet)
+				V.uGlobal.uGrid(v.Local.iGrid)!Part.Set(V.uGlobal.uParts(v.Local.i)!Part)
+				V.uGlobal.uGrid(v.Local.iGrid)!Cert_Loc.Set(V.Local.sRet)
+				V.uGlobal.uGrid(v.Local.iGrid)!JOB.Set(V.uGlobal.uParts(v.Local.i)!JOB)
+			F.Intrinsic.Control.EndIf
+			F.ODBC.conX!rstDoc.Close
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.Next(V.Local.i3)
+
+	'Now get inventory Docs(30) for current Part in uPart UDT
+	F.Intrinsic.String.Build("Select Part+Location as KEYID from v_INVENTORY_MSTR where PART = '{0}'",V.uGlobal.uParts(v.Local.i)!Part,V.Local.sSql)
+	F.ODBC.Connection!conX.OpenRecordsetRO("rst",V.Local.sSql)
+	F.Intrinsic.Control.If(V.ODBC.conX!rst.EOF,<>,True)
+		F.Global.DocumentControl.GetLinkID(V.ODBC.conX!rst.FieldVal!KEYID,30,V.Local.iRet)
+		F.Intrinsic.String.Build("Select * from ATG_DOC_ASSOC where LINK_ID = '{0}' and GRP_ID = '{1}'",V.Local.iRet,V.Global.sDocGroup,V.Local.sSql)
+		F.ODBC.Connection!conX.OpenRecordsetRO("rstDoc",V.Local.sSql)
+		F.Intrinsic.Control.If(V.ODBC.conX!rstDoc.EOF,<>,True)
+
+			'Resize uGrid
+			F.Intrinsic.Math.Add(V.uGlobal.uGrid.UBound,1,V.Local.iGrid)
+			F.Intrinsic.Control.If(V.uGlobal.uGrid.LBound,=,-1)
+				V.uGlobal.uGrid.Redim(0,V.Local.iGrid)
+			F.Intrinsic.Control.Else
+				V.uGlobal.uGrid.RedimPreserve(V.uGlobal.uGrid.LBound,V.Local.iGrid)
+			F.Intrinsic.Control.EndIf
+
+			'Get Doc Path
+			F.Intrinsic.String.Build("{0}{1}",V.ODBC.conX!rstDoc.FieldValTrim!PATH,V.ODBC.conX!rstDoc.FieldValTrim!FILE,V.Local.sRet)
+			V.uGlobal.uGrid(v.Local.iGrid)!Part.Set(V.uGlobal.uParts(v.Local.i)!Part)
+			V.uGlobal.uGrid(v.Local.iGrid)!Cert_Loc.Set(V.Local.sRet)
+		F.Intrinsic.Control.EndIf
+		F.ODBC.conX!rstDoc.Close
+	F.Intrinsic.Control.EndIf
+	F.ODBC.conX!rst.Close
+
+F.Intrinsic.Control.Next(V.Local.i)
+
+'Flag duplicates in uGrid Based on Part and Document Path
+F.Intrinsic.Variable.UDTMultiFlagDuplicates(V.uGlobal.uGrid!Part,V.uGlobal.uGrid!Cert_Loc)
+F.Intrinsic.Variable.UDTDeleteFlagged(V.uGlobal.uGrid)
+'Get rid of any blank Part entries
+F.Intrinsic.Variable.UDTMultiFlag(V.uGlobal.uGrid!Part,"")
+F.Intrinsic.Variable.UDTDeleteFlagged(V.uGlobal.uGrid)
+
+'Load Grid from UDT
+Gui.F_Print_Certs.gsfg_Certs.LoadFromUDT("uGlobal.uGrid","Part::1*!*Cert_Loc::3*!*JOB::2",2)
+F.Intrinsic.UI.CloseWaitDialog
+
+Gui.F_Print_Certs..Show
+
+F.Intrinsic.Control.Label("LoadCerts_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3954_MAT_CERT_PRINT.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.LoadCerts.End
+
+program.sub.cmdprint_click.start
+F.Intrinsic.Control.SetErrorHandler("cmdprint_click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+V.Local.i.Declare(Long)
+V.Local.iRows.Declare(Long)
+V.Local.sRet.Declare(String)
+V.Local.bStatus.Declare(Boolean)
+
+V.Local.iRows.Set(V.Screen.F_Print_Certs!gsfg_Certs.Rows)
+F.Intrinsic.Math.Sub(V.Local.iRows,1,V.Local.iRows)
+F.Intrinsic.Control.For(V.Local.i,1,V.Local.iRows,1)
+	Gui.F_Print_Certs.gsfg_Certs.ReadRow(V.Local.i,V.Local.sRet)
+	F.Intrinsic.String.Split(V.Local.sRet,"*!*",V.Local.sRet)
+	F.Intrinsic.Control.If(V.Local.sRet(0).Trim,=,1)
+		'if Checked then Print
+		F.Intrinsic.Task.ShellExec(V.Caller.Handle,"PRINT",V.Local.sRet(3).Trim,"","",1)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.Next(V.Local.i)
+
+'Save record of Printed Certs
+F.Intrinsic.Control.CallSub(Saveprintedcerts)
+
+F.Intrinsic.UI.MsgBox("Documents Sent to Printer","Documents Printed")
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdprint_click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3954_MAT_CERT_PRINT.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+program.sub.cmdprint_click.end
+
+program.sub.form1_unload.start
+F.Intrinsic.Control.End
+
+program.sub.form1_unload.end
+
+Program.Sub.BuildStyles.Start
+F.Intrinsic.Control.SetErrorHandler("BuildStyles_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+'Build Styles for Printing Certs Grid
+
+Gui.F_Print_Certs.gsfg_Certs.Cols(4)
+Gui.F_Print_Certs.gsfg_Certs.Rows(1)
+Gui.F_Print_Certs.gsfg_Certs.Rows(2)
+
+'buildstyle 1 for top row, not fixed row because have an active checkbox
+'buildstyle 2 for data rows
+
+'checkbox
+'Checkbox for header and Data row, Column Header Checkbox will check or uncheck all
+Gui.F_Print_Certs.gsfg_Certs.BuildStyle(1,0,"Type","Checkbox","")
+Gui.F_Print_Certs.gsfg_Certs.BuildStyle(1,0,"Color","Back",V.Color.LtGray)
+Gui.F_Print_Certs.gsfg_Certs.BuildStyle(2,0,"Type","Checkbox","")
+
+'Part
+'Locked column for both header and data
+Gui.F_Print_Certs.gsfg_Certs.TextMatrix(1,0,"Part")
+Gui.F_Print_Certs.gsfg_Certs.BuildStyle(1,1,"Format","Alignment",2)
+Gui.F_Print_Certs.gsfg_Certs.BuildStyle(1,1,"Type","Locked",True)
+Gui.F_Print_Certs.gsfg_Certs.BuildStyle(1,1,"Color","Back",V.Color.LtGray)
+'Work Order
+'Locked column for both header and data
+Gui.F_Print_Certs.gsfg_Certs.TextMatrix(2,0,"Work Order")
+Gui.F_Print_Certs.gsfg_Certs.BuildStyle(1,2,"Format","Alignment",2)
+Gui.F_Print_Certs.gsfg_Certs.BuildStyle(1,2,"Type","Locked",True)
+Gui.F_Print_Certs.gsfg_Certs.BuildStyle(1,2,"Color","Back",V.Color.LtGray)
+'File
+'Lock Header Row
+Gui.F_Print_Certs.gsfg_Certs.TextMatrix(3,0,"View File")
+Gui.F_Print_Certs.gsfg_Certs.BuildStyle(1,3,"Type","Locked",True)
+Gui.F_Print_Certs.gsfg_Certs.BuildStyle(1,3,"Color","Back",V.Color.LtGray)
+Gui.F_Print_Certs.gsfg_Certs.BuildStyle(1,3,"Format","Alignment",2)
+'Hyperlink it on cell-click to view cert
+Gui.F_Print_Certs.gsfg_Certs.BuildStyle(2,3,"Color","Fore",16711680)
+Gui.F_Print_Certs.gsfg_Certs.BuildStyle(2,3,"Color","Back",V.Color.White)
+Gui.F_Print_Certs.gsfg_Certs.BuildStyle(2,3,"Type","Locked",True)
+
+
+
+
+Gui.F_Print_Certs.gsfg_Certs.SetColumnPercentages(".05:.15:.15:.65")
+
+Gui.F_Print_Certs.gsfg_Certs.ApplyStyle(0,1)
+Gui.F_Print_Certs.gsfg_Certs.ApplyStyle(1,2)
+
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("BuildStyles_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3954_MAT_CERT_PRINT.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.BuildStyles.End
+
+program.sub.gsfg_certs_checkclick.start
+F.Intrinsic.Control.SetErrorHandler("gsfg_certs_checkclick_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+V.Local.sChecked.Declare(String)
+V.Local.iRows.Declare(Long)
+V.Local.i.Declare(Long)
+
+'check or uncheck all rows based on top checkbox value
+F.Intrinsic.Control.If(V.Args.key,=,0)
+	Gui.F_Print_Certs.gsfg_Certs.GetTextMatrix(V.Args.Column,V.Args.key,V.Local.sChecked)
+	V.Local.iRows.Set(V.Screen.F_Print_Certs!gsfg_Certs.Rows)
+	F.Intrinsic.Math.Sub(V.Local.iRows,1,V.Local.iRows)
+	F.Intrinsic.Control.For(V.Local.i,1,V.Local.iRows,1)
+		Gui.F_Print_Certs.gsfg_Certs.TextMatrix(0,V.Local.i,V.Local.sChecked)
+	F.Intrinsic.Control.Next(V.Local.i)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("gsfg_certs_checkclick_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3954_MAT_CERT_PRINT.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+program.sub.gsfg_certs_checkclick.end
+
+program.sub.gsfg_certs_cellenter.start
+F.Intrinsic.Control.SetErrorHandler("gsfg_certs_cellenter_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+'if column 2 where file path is, pass it to shellExecute to open in default viewer of file
+V.Local.sRet.Declare(String)
+
+F.Intrinsic.Control.If(V.Args.column,=,2)
+F.Intrinsic.Control.AndIf(V.Args.Key,>,0)
+	Gui.F_Print_Certs.gsfg_Certs.GetTextMatrix(V.Args.column,V.Args.Key,V.Local.sRet)
+	'this opens in default viewer for that file type based on default program settings in windows
+	F.Intrinsic.Task.ShellExec(V.Caller.Handle,"OPEN",V.Local.sRet,"","",1)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("gsfg_certs_cellenter_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3954_MAT_CERT_PRINT.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+program.sub.gsfg_certs_cellenter.end
+
+Program.Sub.LoadIssuedParts.Start
+F.Intrinsic.Control.SetErrorHandler("LoadBOMParts_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+V.Local.i.Declare(Long)
+V.Local.iUB.Declare(Long)
+V.Local.sRet.Declare(String)
+V.Local.sSql.Declare(String)
+
+V.uGlobal.uIssued.Redim(-1,-1)
+
+'Load any Parts issued to Work ORder that is tied to sales order, omit Finished Good Sequences 999999
+F.Intrinsic.Control.For(V.Local.i,V.uGlobal.uParts.LBound,V.uGlobal.uParts.UBound,1)
+	F.Intrinsic.String.Build("Select '{0}' as PARENT,a.PART from V_ITEM_HISTORY a left outer join v_inventory_mstr b on a.part = b.part where a.PART <> '{0}'  and JOB = '{1}' and SEQUENCE <> '999999'",V.uGlobal.uParts(v.Local.i)!Part,V.uGlobal.uParts(v.Local.i)!JOB,V.Local.sSql)
+	F.ODBC.Connection!conX.OpenRecordsetRO("rst",V.Local.sSql)
+	F.Intrinsic.Control.If(V.ODBC.conX!rst.EOF,<>,True)
+		V.uGlobal.uParts(v.Local.i)!FLAG_BOM.Set("Y")
+		F.Intrinsic.Variable.LoadUDTFromRecordset("conX","rst","v.uGlobal.uIssued",True)
+	F.Intrinsic.Control.EndIf
+	F.ODBC.conX!rst.Close
+F.Intrinsic.Control.Next(V.Local.i)
+
+'Delete duplicate parts
+F.Intrinsic.Variable.UDTMultiFlagDuplicates(V.uGlobal.uIssued!Part)
+F.Intrinsic.Variable.UDTDeleteFlagged(V.uGlobal.uIssued)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("LoadBOMParts_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3954_MAT_CERT_PRINT.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.LoadIssuedParts.End
+
+program.sub.cmdtxt_printer_click.start
+F.Intrinsic.Control.SetErrorHandler("cmdtxt_printer_click_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+
+F.Intrinsic.Printer.SelectPrinterDialog
+
+'Set default printer and send printer name to screen
+f.Intrinsic.Control.If(v.Ambient.PrinterDialogSelection,<>,"***CANCEL***")
+	f.Intrinsic.Printer.setDefaultPrinter(v.Ambient.PrinterDialogSelection)
+	gui.F_Print_Certs.txt_Printer.Text(v.Ambient.PrinterDialogSelection)
+F.Intrinsic.Control.EndIf
+
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdtxt_printer_click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3954_MAT_CERT_PRINT.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+program.sub.cmdtxt_printer_click.end
+
+Program.Sub.SelectPackingList.Start
+F.Intrinsic.Control.SetErrorHandler("SelectPackingList_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+V.Local.sSQL.Declare(String)
+V.Local.sCol.Declare(String)
+V.Local.sColW.Declare(String)
+V.Local.sRet.Declare(String)
+
+'Pass SQL Query
+V.Local.sSql.Set("Select Distinct a.PCK_NO,b.ORDER_NO from GCG_3954_CERT_LOG a right outer join v_SHIPMENT_HEADER b on a.PCK_NO = b.PCK_NO where a.PCK_NO <> ''")
+
+F.Intrinsic.String.Split("Packing List*!*Order No","*!*",V.Local.sCol)
+F.Intrinsic.String.Split("3000*!*3000","*!*",V.Local.sColW)
+
+F.Intrinsic.UI.Browser("Select Packing List","conX",V.Local.sSQL,V.Local.sCol,V.Local.sColW,V.Local.sRet)
+F.Intrinsic.Control.If(V.Local.sRet,<>,"***CANCEL***")
+	'If there is a return, process Return
+	F.Intrinsic.String.Split(V.Local.sRet,"*!*",V.Local.sRet)
+	V.Global.sPackList.Set(V.Local.sRet(0))
+	F.Intrinsic.Control.CallSub(Loadsaveddocs)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("SelectPackingList_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3954_MAT_CERT_PRINT.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.SelectPackingList.End
+
+Program.Sub.LoadSavedDocs.Start
+F.Intrinsic.Control.SetErrorHandler("LoadSavedDocs_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+'LOad Saved Docs from CUSTOM Table that stored which certs were printed with the packing list
+V.Local.sSql.Declare(String)
+V.Local.iRows.Declare(Float)
+V.Local.i.Declare(Float)
+V.Local.sRet.Declare(String)
+
+F.Intrinsic.String.Build("Select FLAG_PRINT,PART,JOB,DOC_PATH from GCG_3954_CERT_LOG where PCK_NO = '{0}'",V.Global.sPackList,V.Local.sSql)
+F.ODBC.Connection!conX.OpenRecordsetRO("rst",V.Local.sSql)
+F.Intrinsic.Control.If(V.ODBC.conX!rst.EOF,<>,True)
+	Gui.F_Print_Certs.gsfg_Certs.LoadRecordset("conX!rst",2,True)
+F.Intrinsic.Control.EndIf
+F.ODBC.conX!rst.Close
+
+'Get Rid of Blank Row
+F.Intrinsic.Math.Sub(V.Screen.F_Print_Certs!gsfg_Certs.Rows,1,V.Local.iRows)
+Gui.F_Print_Certs.gsfg_Certs.Rows(V.Local.iRows)
+
+Gui.F_Print_Certs..Show
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("LoadSavedDocs_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3954_MAT_CERT_PRINT.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.LoadSavedDocs.End
+
+Program.Sub.SavePrintedCerts.Start
+F.Intrinsic.Control.SetErrorHandler("SavePrintedCerts_Err")
+F.Intrinsic.Control.ClearErrors
+
+V.Local.sError.Declare(String)
+'Save record of Certs that were printed with the packing list
+V.Local.sRet.Declare(String)
+V.Local.i.Declare(Float)
+V.Local.iRows.Declare(Float)
+V.local.bStatus.Declare(Boolean)
+V.local.sSql.Declare(String)
+
+V.Local.iRows.Set(V.Screen.F_Print_Certs!gsfg_Certs.Rows)
+F.Intrinsic.Math.Sub(V.Local.iRows,1,V.Local.iRows)
+F.Intrinsic.Control.For(V.Local.i,1,V.Local.iRows,1)
+	Gui.F_Print_Certs.gsfg_Certs.ReadRow(V.Local.i,V.Local.sRet)
+	F.Intrinsic.String.Split(V.Local.sRet,"*!*",V.Local.sRet)
+	F.Intrinsic.String.Build("Select * from GCG_3954_CERT_LOG where PCK_NO = '{0}' and PART = '{1}' and DOC_PATH = '{2}'",V.Global.sPackList,V.Local.sRet(1),V.Local.sRet(2),V.Local.sSql)
+	F.ODBC.Connection!conX.OpenRecordsetRW("rst",V.Local.sSql)
+	F.Intrinsic.Control.If(V.ODBC.conX!rst.EOF,<>,True)
+		F.ODBC.conX!rst.Set!PCK_NO(V.Global.sPackList)
+		F.ODBC.conX!rst.Set!PART(V.Local.sRet(1))
+		F.ODBC.conX!rst.Set!DOC_PATH(V.Local.sRet(3))
+		F.Intrinsic.Control.If(V.Local.sRet(0),=,1)
+			F.ODBC.conX!rst.Set!FLAG_PRINT("1")
+		F.Intrinsic.Control.Else
+			F.ODBC.conX!rst.Set!FLAG_PRINT("0")
+		F.Intrinsic.Control.EndIf
+		F.ODBC.conX!rst.Set!JOB(V.Local.sRet(2).Trim)
+		F.ODBC.conX!rst.Update
+	F.Intrinsic.Control.Else
+		F.ODBC.conX!rst.AddNew
+		F.ODBC.conX!rst.Set!PCK_NO(V.Global.sPackList)
+		F.ODBC.conX!rst.Set!PART(V.Local.sRet(1))
+		F.ODBC.conX!rst.Set!DOC_PATH(V.Local.sRet(3))
+		F.Intrinsic.Control.If(V.Local.sRet(0),=,1)
+			F.ODBC.conX!rst.Set!FLAG_PRINT("1")
+		F.Intrinsic.Control.Else
+			F.ODBC.conX!rst.Set!FLAG_PRINT("0")
+		F.Intrinsic.Control.EndIf
+		F.ODBC.conX!rst.Set!JOB(V.Local.sRet(2).Trim)
+		F.ODBC.conX!rst.Update
+	F.Intrinsic.Control.EndIf
+	F.ODBC.conX!rst.Close
+F.Intrinsic.Control.Next(V.Local.i)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("SavePrintedCerts_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_3954_MAT_CERT_PRINT.gas",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.SavePrintedCerts.End
+
+Program.Sub.Comments.Start
+${$0$}$GCG_MAT_CERT_PRINT$}$SUPERVSR$}$6/9/2015
+${$3$}$0$}$$}$-1$}$-1$}$$}$1/1/1900$}$Project to print Material certs for all parts including BOM Children that have Certs attached to them.
+
+
+Program.Sub.Comments.End
+
